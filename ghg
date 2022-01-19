@@ -1,0 +1,49 @@
+import Foundation
+import Moya
+
+enum GithubApi {
+    case text
+    case comparable(firstWord: String, secondWord: String)
+    case showRepositories
+      
+    }
+extension GithubApi: TargetType {
+var baseURL: URL { URL(string:  "https://github.com")! }
+var path: String {
+    switch self {
+    case .text:
+        return "/trending"
+    case .showRepositories:
+        return "/repositories"
+    case .comparable (_,_):
+        return " "
+                }
+    }
+
+
+var method: Moya.Method {
+    switch self {
+    case .text, .comparable:
+        return .get
+    case .showRepositories:
+        return .post
+    }
+}
+
+var task: Task {
+      switch self {
+      case .text, .showRepositories:
+          return .requestPlain
+      case let .comparable(firstWord, secondWord):
+          return .requestParameters(parameters: [firstWord: String(), secondWord: String()], encoding: URLEncoding.queryString)
+        }
+    }
+var headers: [String: String]? {
+    return ["Content-type": "application/json"]
+    
+    }
+}
+
+
+
+
